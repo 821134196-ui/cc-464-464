@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>试驾车预约与车况交接平台</title>
+<link rel="stylesheet" href="/styles.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%231e242d'/%3E%3Cpath d='M7 19l3-7h12l3 7v4h-3a2 2 0 11-4 0H14a2 2 0 11-4 0H7z' fill='%23f4f7fb'/%3E%3Ccircle cx='12' cy='20' r='2' fill='%231763e0'/%3E%3Ccircle cx='20' cy='20' r='2' fill='%231763e0'/%3E%3C/svg%3E">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand"><span class="logo"></span><b>试驾交接台</b><small>DEMO · 虚构数据</small></div>
+  <nav class="tabs" id="tabs"></nav>
+  <div class="spacer"></div>
+  <div class="identity">
+    <span class="muted" id="clock"></span>
+    <span>当前身份</span>
+    <select id="actorSelect"></select>
+    <span class="role-chip" id="roleChip"></span>
+  </div>
+</header>
+<main id="view"></main>
+<div id="toast"></div>
+<script src="/app.js"></script>
+</body>
+</html>

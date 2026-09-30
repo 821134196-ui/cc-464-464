@@ -1,0 +1,15 @@
+{
+  "name": "testdrive-desk",
+  "version": "1.0.0",
+  "private": true,
+  "description": "汽车门店试驾车预约与车况交接平台（虚构数据）",
+  "type": "commonjs",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "start": "node --no-warnings src/server.js",
+    "reset": "node --no-warnings src/seed.js --reset",
+    "test": "node --test --no-warnings test/platform.test.js"
+  }
+}
