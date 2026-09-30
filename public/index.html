@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>试驾车预约与车况交接平台</title>
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand"><span class="dot"></span>星途门店 · 试驾交接台</div>
+  <nav id="nav">
+    <button data-view="board" class="active">车辆状态板</button>
+    <button data-view="calendar">车型日历</button>
+    <button data-view="approvals">预约审核</button>
+    <button data-view="reservations">我的预约</button>
+    <button data-view="ops">留观 / 事故</button>
+  </nav>
+  <div class="spacer"></div>
+  <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:#c8ced6">
+    当前操作员
+    <select id="staffSelect" style="min-width:150px"></select>
+  </label>
+  <span id="roleTag" class="role-tag">—</span>
+</header>
+
+<main>
+  <!-- ============ 车辆状态板 ============ -->
+  <section class="view active" id="view-board">
+    <h1>车辆状态板 <span class="badge blue">按车型分组</span></h1>
+    <div class="sub">出车前核对里程、油量与四方位照片；完成违章留观和清洁后车辆才可再次预约。点击车辆查看详情。</div>
+    <div class="legend">
+      <span><i style="background:var(--ok)"></i>可预约</span>
+      <span><i style="background:var(--warn)"></i>已锁定</span>
+      <span><i style="background:var(--signal-blue)"></i>试驾中</span>
+      <span><i style="background:#8a5bd0"></i>回车检查</span>
+      <span><i style="background:#4a9bb5"></i>违章留观</span>
+      <span><i style="background:#6d8a99"></i>待清洁</span>
+      <span><i style="background:var(--danger)"></i>异常封锁</span>
+    </div>
+    <div id="boardWrap"></div>
+  </section>
+
+  <!-- ============ 车型日历 ============ -->
+  <section class="view" id="view-calendar">
+    <h1>车型日历</h1>
+    <div class="sub">同一日历同时展示车辆与顾问占用，红色块表示存在时段冲突的待审单。</div>
+    <div class="cal-toolbar">
+      <button class="gray sm" id="calPrev">‹ 前一天</button>
+      <input type="date" id="calDate" style="width:160px">
+      <button class="gray sm" id="calNext">后一天 ›</button>
+      <button class="ghost sm" id="calToday">今天</button>
+      <span class="spacer" style="flex:1"></span>
+      <span class="legend" style="margin:0">
+        <span><i style="background:var(--signal-blue)"></i>车辆占用</span>
+        <span><i style="background:var(--graphite-2)"></i>顾问占用</span>
+        <span><i style="background:var(--danger)"></i>冲突待审</span>
+      </span>
+    </div>
+    <div id="calWrap" style="overflow-x:auto"></div>
+  </section>
+
+  <!-- ============ 预约审核 ============ -->
+  <section class="view" id="view-approvals">
+    <h1>预约审核</h1>
+    <div class="sub">通过后锁定车辆与销售顾问；跨日试驾须先有主管的单独审批；押金由付款适配器实时冻结。</div>
+    <div class="card">
+      <h3>新建预约（客户代号 + 驾照核验）</h3>
+      <div class="grid cols-3">
+        <label class="field">客户代号<input id="nr-code" placeholder="如 C-1031"></label>
+        <label class="field">证件号（虚构；X 开头无效 / E 开头过期 / Y 结尾未成年）<input id="nr-id" placeholder="如 SH310101199001010031"></label>
+        <label class="field">称呼（可空）<input id="nr-name" placeholder="核验通过后回填"></label>
+        <label class="field">车型<select id="nr-model"></select></label>
+        <label class="field">路线<select id="nr-route"></select></label>
+        <label class="field">指定车辆（可空，自动派车）<select id="nr-vehicle"><option value="">自动分配同车型可用车</option></select></label>
+        <label class="field">开始<input type="datetime-local" id="nr-start"></label>
+        <label class="field">结束（次日即触发跨日审批）<input type="datetime-local" id="nr-end"></label>
+        <label class="field">随车人员<input id="nr-companion" placeholder="如 客户配偶随行"></label>
+      </div>
+      <div class="row"><button id="nr-submit">核验驾照并建立预约</button><span id="nr-verify" class="muted"></span></div>
+    </div>
+    <div class="card">
+      <h3>待审核队列</h3>
+      <div style="overflow-x:auto"><table id="approvalTable"></table></div>
+    </div>
+  </section>
+
+  <!-- ============ 我的预约 ============ -->
+  <section class="view" id="view-reservations">
+    <h1 id="resListTitle">预约清单</h1>
+    <div class="sub">销售仅可操作锁定给自己的预约；待审核池全员可见。点击行进入全流程操作。</div>
+    <div class="card" style="overflow-x:auto"><table id="resTable"></table></div>
+  </section>
+
+  <!-- ============ 留观 / 事故 / 清洁 ============ -->
+  <section class="view" id="view-ops">
+    <h1>违章留观 · 事故复核 · 清洁</h1>
+    <div class="grid cols-2">
+      <div class="card">
+        <h3>违章留观中 / 待清洁车辆</h3>
+        <div id="obsList"></div>
+      </div>
+      <div class="card">
+        <h3>事故 / 故障待主管复核</h3>
+        <div id="incidentList"></div>
+        <p class="muted" style="font-size:12px">普通销售不能清除车况异常；事故结论必须由主管确认。</p>
+      </div>
+    </div>
+    <div class="card">
+      <h3>定时任务（进程内，每 10 秒自动执行）</h3>
+      <div class="row">
+        <button class="gray" id="btnTick">立即执行一次</button>
+        <span class="muted">释放迟到超过 15 分钟的预约；结束已到期的违章留观并转入待清洁。</span>
+      </div>
+      <div id="tickResult" class="mono" style="font-size:12px;margin-top:8px"></div>
+    </div>
+  </section>
+</main>
+
+<!-- ============ 预约详情抽屉 ============ -->
+<div class="drawer-mask" id="mask"></div>
+<aside class="drawer" id="drawer">
+  <header>
+    <div id="drTitle">预约详情</div>
+    <span id="drStatus" class="badge"></span>
+    <button class="x" id="drClose">×</button>
+  </header>
+  <div class="body" id="drBody"></div>
+</aside>
+
+<div class="toast-wrap" id="toasts"></div>
+<script src="/app.js"></script>
+</body>
+</html>

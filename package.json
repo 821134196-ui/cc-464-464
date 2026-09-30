@@ -1,0 +1,16 @@
+{
+  "name": "testdrive-platform",
+  "version": "1.0.0",
+  "description": "汽车门店试驾车预约与车况交接平台（虚构数据）",
+  "private": true,
+  "type": "module",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node --no-warnings src/server.js",
+    "dev": "node --no-warnings src/server.js",
+    "test": "node --no-warnings --test test/*.test.js"
+  },
+  "engines": {
+    "node": ">=22.5.0"
+  }
+}
